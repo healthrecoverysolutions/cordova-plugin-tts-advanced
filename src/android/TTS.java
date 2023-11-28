@@ -96,10 +96,10 @@ public class TTS extends CordovaPlugin implements OnInitListener {
         context = cordova.getActivity().getApplicationContext();
         webViewContext = webView;
         try {
-            createTTSInstance(execCallbackContext);
+            createTTSInstance(null);
         }
         catch (Exception e) {
-            Timber.e("TTS:" + e.getMessage());
+            Timber.e(e.getMessage());
         }
     }
 
@@ -113,7 +113,7 @@ public class TTS extends CordovaPlugin implements OnInitListener {
                 speak(args, callbackContext);
             }
             catch(Exception e) {
-                Timber.e("TTS: " + e.getMessage());
+                Timber.e(e.getMessage());
                 callbackContext.error(e.getMessage());
             }
         } else if (action.equals("stop")) {
@@ -121,7 +121,7 @@ public class TTS extends CordovaPlugin implements OnInitListener {
                 stop(args, callbackContext);
             }
             catch (Exception e) {
-                Timber.e("TTS: " + e.getMessage());
+                Timber.e(e.getMessage());
                 callbackContext.error(e.getMessage());
             }
         } else if (action.equals("checkLanguage")) {
@@ -129,7 +129,7 @@ public class TTS extends CordovaPlugin implements OnInitListener {
                 checkLanguage(args, callbackContext);
             }
             catch (Exception e) {
-                Timber.e("TTS: " + e.getMessage());
+                Timber.e(e.getMessage());
                 callbackContext.error(e.getMessage());
             }
         } else if (action.equals("getVoices")) {
@@ -137,7 +137,7 @@ public class TTS extends CordovaPlugin implements OnInitListener {
                 getVoices(args, callbackContext);
             }
             catch (Exception e) {
-                Timber.e("TTS: " + e.getMessage());
+                Timber.e(e.getMessage());
                 callbackContext.error(e.getMessage());
             }
         } else if (action.equals("openInstallTts")) {
@@ -145,7 +145,7 @@ public class TTS extends CordovaPlugin implements OnInitListener {
                 callInstallTtsActivity(args, callbackContext);
             }
             catch (Exception e) {
-                Timber.e("TTS: " + e.getMessage());
+                Timber.e(e.getMessage());
                 callbackContext.error(e.getMessage());
             }
         } else {
@@ -156,10 +156,10 @@ public class TTS extends CordovaPlugin implements OnInitListener {
 
     @Override
     public void onInit(int status) {
-        Timber.v("TTS: tts STARTED");
+        Timber.v("tts STARTED");
         if (status != TextToSpeech.SUCCESS) {
             tts = null;
-            Timber.e("TTS Initialization status: ", status);
+            Timber.e("Initialization status: ", status);
         } else {
             try {
                 // if we have a callback context we are reading a pending script
@@ -182,11 +182,11 @@ public class TTS extends CordovaPlugin implements OnInitListener {
                     } else {
                         tts.speak("", TextToSpeech.QUEUE_FLUSH, null);
                     }
-                    Timber.v("TTS: SUCCESS");
+                    Timber.v("SUCCESS");
                 }
             }
             catch (Exception e) {
-                Timber.e("TTS: " + e.getMessage());
+                Timber.e(e.getMessage());
                 if (execCallbackContext != null) {
                     execCallbackContext.error(e.getMessage());
                 }
@@ -209,7 +209,7 @@ public class TTS extends CordovaPlugin implements OnInitListener {
         throws JSONException, NullPointerException {
         tts = new TextToSpeech(cordova.getActivity().getApplicationContext(), this, "com.google.android.tts");
         if (tts == null) {
-            Timber.e("TTS: " + ERR_ERROR_INITIALIZING);
+            Timber.e(ERR_ERROR_INITIALIZING);
             if (callbackContext != null) {
                 callbackContext.error(ERR_ERROR_INITIALIZING);
             }
@@ -275,10 +275,10 @@ public class TTS extends CordovaPlugin implements OnInitListener {
 
         if (params.isNull("identifier")) {
             identifier = "";
-            Timber.v("TTS: No voice identifier");
+            Timber.v("No voice identifier");
         } else {
             identifier = params.getString("identifier");
-            Timber.v("TTS - got identifier: " + identifier);
+            Timber.v("got identifier: " + identifier);
         }
 
         if (params.isNull("locale")) {
@@ -290,22 +290,22 @@ public class TTS extends CordovaPlugin implements OnInitListener {
         if (!params.isNull("cancel")) {
             cancel = params.getBoolean("cancel");
         }
-        Timber.v("TTS cancel is set to "+cancel+ "("+(cancel?"TextToSpeech.QUEUE_FLUSH":"TextToSpeech.QUEUE_ADD")+")");
+        Timber.v("cancel is set to "+cancel+ "("+(cancel?"TextToSpeech.QUEUE_FLUSH":"TextToSpeech.QUEUE_ADD")+")");
 
         if (params.isNull("rate")) {
             speechRate = 1.0;
-            Timber.v("TTS: No rate provided, so rate is set to " + speechRate);
+            Timber.v("No rate provided, so rate is set to " + speechRate);
         } else {
             speechRate = params.getDouble("rate");
-            Timber.v("TTS: rate is set to " + speechRate);
+            Timber.v("rate is set to " + speechRate);
         }
 
         if (params.isNull("pitch")) {
             pitch = 1.0;
-            Timber.v("TTS: No pitch provided, so pitch set to " + pitch);
+            Timber.v("No pitch provided, so pitch set to " + pitch);
         } else {
             pitch = params.getDouble("pitch");
-            Timber.v("TTS: Pitch set to " + pitch);
+            Timber.v("Pitch set to " + pitch);
         }
 
         if (tts == null) {
@@ -321,7 +321,7 @@ public class TTS extends CordovaPlugin implements OnInitListener {
         // if voices == null tts is not initialized properly, so init again;
         // OnInit() triggered by adding our UtteranceProgressListener will handle calling TTSspeak()
         if (voices == null) {
-            Timber.e("TTS: TextToSpeech.Engine returned 'null' for voices; restarting instance");
+            Timber.e("TextToSpeech.Engine returned 'null' for voices; restarting instance");
             createTTSInstance(callbackContext);
         } else {
             TTSspeak(voices, callbackContext, ttsParams);
@@ -335,7 +335,7 @@ public class TTS extends CordovaPlugin implements OnInitListener {
         if (!identifier.equals("")) {
             for (Voice tmpVoice : voices) {
                 if (tmpVoice.getName().contains(identifier)) {
-                    Timber.v("TTS: Found Voice for identifier: " + tmpVoice.getName());
+                    Timber.v("Found Voice for identifier: " + tmpVoice.getName());
                     voice = tmpVoice;
                     break;
                 } else {
@@ -343,7 +343,7 @@ public class TTS extends CordovaPlugin implements OnInitListener {
                 }
             }
             if (voice == null) {
-                Timber.v("TTS: No Voice for identifier: "+identifier+", we'll try the locale");
+                Timber.v("No Voice for identifier: "+identifier+", we'll try the locale");
             }
         }
         if (voice == null) {
@@ -351,7 +351,7 @@ public class TTS extends CordovaPlugin implements OnInitListener {
             tts.setLanguage(new Locale(localeArgs[0], localeArgs[1]));
             for (Voice tmpVoice : voices) {
                 if (tmpVoice.getName().toLowerCase().contains(locale.toLowerCase())) {
-                    Timber.v("TTS: Found Voice for locale: " + tmpVoice.getName());
+                    Timber.v("Found Voice for locale: " + tmpVoice.getName());
                     voice = tmpVoice;
                     break;
                 } else {
@@ -361,10 +361,10 @@ public class TTS extends CordovaPlugin implements OnInitListener {
         }
 
         if (voice != null) {
-            Timber.v("TTS: We've got a voice: " + voice.getName());
+            Timber.v("We've got a voice: " + voice.getName());
             tts.setVoice(voice);
         } else {
-            Timber.v("TTS: No voice found.");
+            Timber.v("No voice found.");
         }
 
         if (Build.VERSION.SDK_INT >= 27) {
@@ -388,7 +388,7 @@ public class TTS extends CordovaPlugin implements OnInitListener {
         JSONArray languages = new JSONArray();
         for (Voice tmpVoice : voices) {
             JSONObject lang = new JSONObject();
-            Timber.v("TTS: Voice: " + tmpVoice.getName());
+            Timber.v("Voice: " + tmpVoice.getName());
             lang.put("name", tmpVoice.getName());
             lang.put("identifier", tmpVoice.getName());
             lang.put("language", tmpVoice.getLocale());
