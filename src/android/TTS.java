@@ -90,6 +90,9 @@ public class TTS extends CordovaPlugin implements OnInitListener {
                 CallbackContext context = new CallbackContext(callbackId, webViewContext);
                 context.error(ERR_UNKNOWN);
             }
+
+            CallbackContext context = new CallbackContext(callbackId, webViewContext);
+            context.error(errorCode);
         }
     };
 
