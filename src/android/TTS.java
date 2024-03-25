@@ -69,12 +69,12 @@ public class TTS extends CordovaPlugin implements OnInitListener {
         @Override
         public void onStart(String s) {
             // do nothing
-            Timber.v("UtteranceProgressListener onStart")
+            Timber.v("UtteranceProgressListener onStart");
         }
 
         @Override
         public void onDone(String callbackId) {
-            Timber.v("UtteranceProgressListener onDone")
+            Timber.v("UtteranceProgressListener onDone");
             resetSpeechParams();
             if (!callbackId.equals("")) {
                 CallbackContext context = new CallbackContext(callbackId, webViewContext);
@@ -84,7 +84,7 @@ public class TTS extends CordovaPlugin implements OnInitListener {
 
         @Override
         public void onError(String callbackId) {
-            Timber.v("UtteranceProgressListener onError")
+            Timber.v("UtteranceProgressListener onError");
             resetSpeechParams();
             if (!callbackId.equals("")) {
                 CallbackContext context = new CallbackContext(callbackId, webViewContext);
@@ -96,7 +96,7 @@ public class TTS extends CordovaPlugin implements OnInitListener {
 
     @Override
     public void initialize(CordovaInterface cordova, final CordovaWebView webView) {
-        Timber.v("initialize")
+        Timber.v("initialize");
         context = cordova.getActivity().getApplicationContext();
         webViewContext = webView;
         try {
@@ -199,7 +199,7 @@ public class TTS extends CordovaPlugin implements OnInitListener {
 
     private void resetSpeechParams()
     {
-        Timber.v("resetSpeechParams")
+        Timber.v("resetSpeechParams");
         textToRead = null;
         locale = null;
         identifier = null;
