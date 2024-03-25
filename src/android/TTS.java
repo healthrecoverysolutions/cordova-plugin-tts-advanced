@@ -83,14 +83,21 @@ public class TTS extends CordovaPlugin implements OnInitListener {
         }
 
         @Override
-        public void onError(String callbackId, int errorCode) {
-            Timber.e("UtteranceProgressListener onError error code: " + errorCode);
+        public void onError(String callbackId) {
+            Timber.e("UtteranceProgressListener onError, error unknown");
             resetSpeechParams();
             if (!callbackId.equals("")) {
                 CallbackContext context = new CallbackContext(callbackId, webViewContext);
                 context.error(ERR_UNKNOWN);
             }
 
+
+        }
+
+        @Override
+        public void onError(String callbackId, int errorCode) {
+            Timber.e("UtteranceProgressListener onError error code: " + errorCode);
+            resetSpeechParams();
             CallbackContext context = new CallbackContext(callbackId, webViewContext);
             context.error(errorCode);
         }
