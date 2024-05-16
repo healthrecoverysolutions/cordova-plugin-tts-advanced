@@ -424,7 +424,7 @@ public class TTS extends CordovaPlugin implements OnInitListener {
         tts.setPitch((float)pitch);
 
         Timber.d("TTS isSpeaking: %s", tts.isSpeaking());
-        Timber.d("starting speech: %s", textToRead);
+        Timber.d("starting speech: '%s'", textToRead);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             tts.speak(textToRead,cancel?TextToSpeech.QUEUE_FLUSH:TextToSpeech.QUEUE_ADD,null,callbackContext.getCallbackId());
         } else {
