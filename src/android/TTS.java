@@ -58,7 +58,7 @@ public class TTS extends CordovaPlugin implements OnInitListener {
     CordovaWebView webViewContext = null;
     CallbackContext execCallbackContext = null;
 
-    String textToRead;
+    private final LinkedList<String> textToReadBuffer = new LinkedList<>();
     String locale;
     double speechRate = 1.0;
     double pitch = 1.0;
@@ -230,7 +230,7 @@ public class TTS extends CordovaPlugin implements OnInitListener {
     private void resetSpeechParams()
     {
         Timber.d("resetSpeechParams");
-        textToRead = null;
+        textToReadBuffer.clear();
         locale = null;
         identifier = null;
         speechRate = 1.0;
@@ -312,8 +312,11 @@ public class TTS extends CordovaPlugin implements OnInitListener {
             callbackContext.error(ERR_INVALID_OPTIONS);
             return;
         } else {
-            textToRead = params.getString("text");
-            Timber.d("Text to read: " + textToRead);
+            synchronized (textToReadBuffer) {
+                String textToRead = params.getString("text");
+                Timber.d("Text to read: " + textToRead);
+                textToReadBuffer.add(textToRead);
+            }
         }
 
         if (params.isNull("identifier")) {
@@ -378,6 +381,12 @@ public class TTS extends CordovaPlugin implements OnInitListener {
         throws JSONException, NullPointerException {
         Voice voice = null;
         Timber.d("TTSspeak");
+
+        if (textToReadBuffer.isEmpty()) {
+            Timber.w("textToReadBuffer is empty, skipping speakTTS call");
+            return;
+        }
+
         if (!identifier.equals("")) {
             for (Voice tmpVoice : voices) {
                 if (tmpVoice.getName().contains(identifier)) {
@@ -420,15 +429,28 @@ public class TTS extends CordovaPlugin implements OnInitListener {
             Timber.d("Setting speech rate to: %s", (float) speechRate);
             tts.setSpeechRate((float) speechRate);
         }
+
         Timber.d("Setting pitch to: %s", (float) pitch);
         tts.setPitch((float)pitch);
 
-        Timber.d("TTS isSpeaking: %s", tts.isSpeaking());
-        Timber.d("starting speech: '%s'", textToRead);
+        synchronized (textToReadBuffer) {
+            if (cancel) {
+                registerSpeechText(textToReadBuffer.peekLast(), TextToSpeech.QUEUE_FLUSH, callbackContext, ttsParams);
+            } else {
+                for (String text : textToReadBuffer) {
+                    registerSpeechText(text, TextToSpeech.QUEUE_ADD, callbackContext, ttsParams);
+                }
+            }
+            textToReadBuffer.clear();
+        }
+    }
+
+    private void registerSpeechText(String text, int mode, CallbackContext callbackContext, HashMap<String, String> ttsParams) {
+        Timber.d("registerSpeech() isSpeaking: %s, starting speech: '%s' with mode %s", tts.isSpeaking(), text, mode);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            tts.speak(textToRead,cancel?TextToSpeech.QUEUE_FLUSH:TextToSpeech.QUEUE_ADD,null,callbackContext.getCallbackId());
+            tts.speak(text, mode, null, callbackContext.getCallbackId());
         } else {
-            tts.speak(textToRead,cancel?TextToSpeech.QUEUE_FLUSH:TextToSpeech.QUEUE_ADD,ttsParams);
+            tts.speak(text, mode, ttsParams);
         }
     }
 
